@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction} from 'express';
 import { HydratedDocument } from 'mongoose';
-import { UserFields, UserMethods } from '../../../homework-84/api/types';
-import User from '../../../homework-84/api/models/User';
+import {UserFields, UserMethods} from "../types";
+import User from "../models/User";
 
 export interface RequestWithUser extends Request {
     user?: HydratedDocument<UserFields & UserMethods>;
