@@ -21,7 +21,7 @@ tasksRouter.post('/', auth, async (req: RequestWithUser, res, next) => {
         if (error instanceof mongoose.Error.ValidationError) {
             return res.status(422).send(error);
         }
-        next(error);
+        return next(error);
     }
 });
 
@@ -37,8 +37,27 @@ tasksRouter.get('/', auth, async (req: RequestWithUser, res, next) => {
 
         return res.send(tasks);
     } catch (e) {
-        next(e);
+        return next(e);
     }
+});
+
+tasksRouter.delete('/:id', auth, async (req: RequestWithUser, res, next) => {
+
+    try {
+        if (!req.params.id) {
+            res.status(400).send({"error": "Id params must be in url"});
+        }
+        await Task.deleteOne({_id: req.params.id});
+
+        return res.send("task was deleted");
+
+    } catch (error) {
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(422).send(error);
+        }
+        return next(error);
+    }
+
 });
 
 export default tasksRouter;
