@@ -3,9 +3,9 @@ import {Router} from "express";
 import Task from "../models/Task";
 import mongoose from "mongoose";
 
-const taskRouter = Router();
+const tasksRouter = Router();
 
-taskRouter.post('/', auth, async (req: RequestWithUser, res, next) => {
+tasksRouter.post('/', auth, async (req: RequestWithUser, res, next) => {
     try {
         const task = new Task({
             user: req.user?.username,
@@ -24,3 +24,21 @@ taskRouter.post('/', auth, async (req: RequestWithUser, res, next) => {
         next(error);
     }
 });
+
+tasksRouter.get('/', auth, async (req: RequestWithUser, res, next) => {
+    try {
+        let tasks;
+
+        if (req.user) {
+            tasks = await Task.find({user: req.user.username})
+        } else {
+            tasks = await Task.find();
+        }
+
+        return res.send(tasks);
+    } catch (e) {
+        next(e);
+    }
+});
+
+export default tasksRouter;
