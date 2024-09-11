@@ -8,7 +8,7 @@ const tasksRouter = Router();
 tasksRouter.post('/', auth, async (req: RequestWithUser, res, next) => {
     try {
         const task = new Task({
-            user: req.user?.username,
+            user: req.user?._id,
             title: req.body.title,
             description: req.body.description,
             status: req.body.status,
@@ -30,7 +30,7 @@ tasksRouter.get('/', auth, async (req: RequestWithUser, res, next) => {
         let tasks;
 
         if (req.user) {
-            tasks = await Task.find({user: req.user.username})
+            tasks = await Task.find({user: req.user._id})
         } else {
             tasks = await Task.find();
         }
@@ -72,7 +72,7 @@ tasksRouter.put('/:id', auth, async (req: RequestWithUser, res, next) => {
             const task = await Task.findById(req.params.id);
 
 
-            if (task && task.user === String(req.user._id)) {
+            if (task && task.user === String(req.user?._id)) {
 
                 if (req.body.user) {
                     return  res.status(400).send({"error": "User field not must be in request"});
