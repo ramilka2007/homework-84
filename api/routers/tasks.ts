@@ -60,4 +60,41 @@ tasksRouter.delete('/:id', auth, async (req: RequestWithUser, res, next) => {
 
 });
 
+tasksRouter.put('/:id', auth, async (req: RequestWithUser, res, next) => {
+
+    try {
+        if (!req.params.id) {
+            res.status(400).send({"error": "Id params must be in url"});
+        }
+
+        if (req.user?._id) {
+
+            const task = await Task.findById(req.params.id);
+
+
+            if (task && task.user === String(req.user._id)) {
+
+                if (req.body.user) {
+                    return  res.status(400).send({"error": "User field not must be in request"});
+                } else if (!['new', 'in_progress', 'complete'].includes(req.body.status)) {
+                    return  res.status(400).send({"error": "Status not correct."});
+                } else {
+                    const updateTask = await Task.findOneAndUpdate({_id: req.params.id}, req.body);
+                    if (updateTask) updateTask.save();
+
+                    return res.send(updateTask);
+                }
+
+            } else {
+                return res.status(403).send({error: 'You cannot edit not your task'})
+            }
+        }
+    } catch (error) {
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(422).send(error);
+        }
+        return next(error);
+    }
+});
+
 export default tasksRouter;
